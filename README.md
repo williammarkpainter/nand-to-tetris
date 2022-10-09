@@ -1,5 +1,5 @@
 # nand-to-tetris
-File written in multiple programming langagues to support my understanding of the of the Nand to Tetris (https://www.nand2tetris.org/) or part of the course deliverables.
+Files written in multiple programming langagues to support my understanding of the of the Nand to Tetris course (https://www.nand2tetris.org/) including part of the course deliverables.
 
 My main learning medium was Coursera, there are two courses on there:
 - 
