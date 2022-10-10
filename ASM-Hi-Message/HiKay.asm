@@ -1,8 +1,8 @@
-@16900  // Start number 0
+@16900      // Start number 0
 D=A
 @3000
 M=D
-@17605  // Start number 1
+@17605      // Start number 1
 D=A
 @3001
 M=D
@@ -158,69 +158,69 @@ M=D
 D=A
 @4019
 M=D
-@2      // Address 2 keeps track of the -1 or 0 writing
-M=-1    // Set address 2 to -1 to start with writing black on sreccn, Main loop start LB_Main_Start
-@3      // Address 3 keeps track of the run number
-M=0
-@20     // Address 4 holds the max number
+@2          // # MAIN CODE START # Address 2 keeps track of the -1 or 0 writing
+M=-1        // Set address 2 to -1 to start with writing black on sreccn, Main loop start 
+@3          // # INTINIATE LOOP START # Address 3 keeps track of the run number (LB_Main_Start)
+M=0         // Which is intially set to 0
+@20         // Address 4 holds the max number of character components, which is currentl 20
 D=A
 @4
 M=D
-@3      // ## START of component loop [LB_comp_start], set address 0 =  3000 + value in address 3
+@3          // ## START of component loop [LB_comp_start], set address 0 =  3000 + value in address 3,
 D=M
 @3000
 A=D+A
 D=M
 @0
-M=D
-@3   // set address 1 =  4000 + value in address 3
+M=D         // Value in RAM[0] is not set to RAM[3000+RAM[3]], this is the start memeor address for the character component
+@3          // Value in RAM[1] =  4000 + value in address 3
 D=M
 @4000
 A=D+A
 D=M
 @1
-M=D
-@2      // ##START WRITE LOOP## [LB_startwrite]
-D=M
-@0      // set the memory location pointed to in address 0 to the value in address 2
+M=D         // Value in RAM[1] is not set to RAM[4000+RAM[3]], this is the start memeor address for the character component
+@2          // ##START WRITE LOOP## [LB_startwrite], this is the loop entry point for writing each charater
+D=M         // D now how the write value from RAM[2], this is either -1 or 0 
+@0          // Set the Address register to the memory location pointed to in address 0 
 A=M
-M=D
-@32     // Increment Address 0 by 32 set into D as well for check if still less than
+M=D         // Set the value of the memory location to the value in D which is from RAM[2] and is either 0 or 1
+@32         // Increment RAM[0] by 32 and set that new value in  D as well
 D=A
 @0      
 MD=M+D  
-@1
+@1          // If the value in RAM[1] is still greater than the value in RAM[0] then loop back to LB_startwrite to continue writing the next line
 D=M-D
-@182     // Set jump address to LB_startwrite
-D;JGT
-@3      // Increament run component counter Address 3
-MD=M+1  // Get the Value in Address 3 into the the data regisrty and check is less than address 4
+@182        // Set jump address to LB_startwrite
+D;JGT       // The Jump instruction
+@3          // Once the charcater component has been compleated, we need to increament the run component counter in RAM[3] to take us to the next 
+MD=M+1      // Get the Value in RAM[3] into the the data regisrty and check is less than RAM[4] (which is the maximum component count.
 @4
 D=M-D
-@168     // jump address to LB_comp_start
+@168        // jump address to LB_comp_start to write the next component 
 D;JGT
-@5      // set delay for 5000  jumps, using Address 5 as counter
-M=0     
-@5      // LB_Delay_loop_start
-M=M+1     
-@6
-M=0     
-@6      // LB_Inner_CounterLoop to further control the speed of the flashing
-D=1     // pointless process
-MD=M+1
-@20
-D=A-D   
-@207
-D; JGT
-@5      // outside innerloop
+@5          // Once all character components have been written, run through a delay loop of 24,000 * 20
+M=0         // The delay outer loop counter is held in RAM[5]
+@5          // The outer loop starts here LB_Delay_loop_start
+M=M+1       // Increment RAM[5], the outerloop counter here
+@6          // There is an inner delay loop of 20 
+M=0         // The innter delay loop counter is held in RAM[6]
+@6          // This is the start of the inner loop (LB_Inner_CounterLoop) to further control the speed of the flashing
+D=1         // pointless process
+MD=M+1      // Increment and set RAM[6] and Data Register
+@20         // set the Addresss resigister to 20
+D=A-D       
+@207        // set jump address for Inner Loop
+D; JGT      // Jump to LB_Inner_CounterLoop if RAM[6] < 20
+@5          // Once innner loop is compleated, need to check outer loop, which was incremented in line 205
 D=M     
-@24000
+@24000      // Check if outerloop is greater, than 24_000
 D=D-A
-@203    // set jump address to LB_Delay_loop_start instruction
-D;JLT   // jump if counter - 5000 is less than 0
-@2      // Flip the writing colour in Address 2
+@203        // set jump address to LB_Delay_loop_start instruction
+D;JLT       // jump if counter - 24000 is less than 0
+@2          // once the delay loop has been compleated, flip the writing colour in RAM[2] from -1 to 0, or 0 to -1
 M=!M
-@161    // jump to LB_Main_Start
-0;JMP
+@162        // Set jump address to LB_Main_Start
+0;JMP       // Unconditional jump for infinate loop
 
 
