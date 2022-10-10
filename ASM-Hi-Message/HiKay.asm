@@ -1,160 +1,160 @@
-@16900      // Start number 0
+@16900      // Start of component 0 (1 of 4 H) ## Start of Code for loading the start memory addresses for each letter components ## 
 D=A
 @3000
 M=D
-@17605      // Start number 1
+@17605      // Start of component 1 (2 of 4 H)
 D=A
 @3001
 M=D
-@17606      // Start number 2
+@17606      // Start of component 2 (3 of 4 H)
 D=A
 @3002
 M=D
-@16903      // Start number 3
+@16903      // Start of component 3 (4 of 4 H)
 D=A
 @3003
 M=D
-@16905      // Start number 4
+@16905      // Start of component 4 (1 of 1 I)
 D=A
 @3004
 M=D
-@16908      // Start number 5
+@16908      // Start of component 5 (1 of 6 K)
 D=A
 @3005
 M=D
-@17389      // Start number 6
+@17389      // Start of component 6 (2 of 6 K)
 D=A
 @3006
 M=D
-@17134      // Start number 7
+@17134      // Start of component 7 (3 of 6 K)
 D=A
 @3007
 M=D
-@17966      // Start number 8
+@17966      // Start of component 8 (4 of 6 K)
 D=A
 @3008
 M=D
-@16911      // Start number 9
+@16911      // Start of component 9 (5 of 6 K)
 D=A
 @3009
 M=D
-@18159      // Start number 10
+@18159      // Start of component 10 (6 of 6 K)
 D=A
 @3010
 M=D
-@16913      // Start number 11
+@16913      // Start of component 11 (1 of 4 A)
 D=A
 @3011
 M=D
-@16914      // Start number 12
+@16914      // Start of component 12 (2 of 4 A)
 D=A
 @3012
 M=D
-@17554      // Start number 13
+@17554      // Start of component 13 (3 of 4 A)
 D=A
 @3013
 M=D
-@16915      // Start number 14
+@16915      // Start of component 14 (4 of 4 A)
 D=A
 @3014
 M=D
-@16917      // Start number 15
+@16917      // Start of component 15 (1 of 5 Y)
 D=A
 @3015
 M=D
-@17302      // Start number 16
+@17302      // Start of component 16 (2 of 5 Y)
 D=A
 @3016
 M=D
-@17687      // Start number 17
+@17687      // Start of component 17 (3 of 5 Y)
 D=A
 @3017
 M=D
-@17304      // Start number 18
+@17304      // Start of component 18 (4 of 5 Y)
 D=A
 @3018
 M=D
-@16921      // End number 19
+@16921      // Start of component 19 (5 of 5 Y)
 D=A
 @3019
 M=D
-@18436      // End number 0
+@18436      // End of component 0 ## Start of Code for loading the end memory addresses for each letter components ## 
 D=A
 @4000
 M=D
-@17733      // End number 1
+@17733      // End of component 1
 D=A
 @4001
 M=D
-@17734      // End number 2
+@17734      // End of component 2
 D=A
 @4002
 M=D
-@18439      // End number 3
+@18439      // End of component 3
 D=A
 @4003
 M=D
-@18441      // End number 4
+@18441      // End of component 4
 D=A
 @4004
 M=D
-@18444      // End number 5
+@18444      // End of component 5
 D=A
 @4005
 M=D
-@17997      // End number 6
+@17997      // End of component 6
 D=A
 @4006
 M=D
-@17422      // End number 7
+@17422      // End of component 7
 D=A
 @4007
 M=D
-@18222      // End number 8
+@18222      // End of component 8
 D=A
 @4008
 M=D
-@17188      // End number 9
+@17188      // End of component 9
 D=A
 @4009
 M=D
-@18447      // End number 10
+@18447      // End of component 10
 D=A
 @4010
 M=D
-@18449      // End number 11
+@18449      // End of component 11
 D=A
 @4011
 M=D
-@17138      // End number 12
+@17138      // End of component 12
 D=A
 @4012
 M=D
-@17682      // End number 13
+@17682      // End of component 13
 D=A
 @4013
 M=D
-@18451      // End number 14
+@18451      // End of component 14
 D=A
 @4014
 M=D
-@17333      // End number 15
+@17333      // End of component 15
 D=A
 @4015
 M=D
-@17718      // End number 16
+@17718      // End of component 16
 D=A
 @4016
 M=D
-@18455      // End number 17
+@18455      // End of component 17
 D=A
 @4017
 M=D
-@17720      // End number 18
+@17720      // End of component 18
 D=A
 @4018
 M=D
-@17337      // End number 19
+@17337      // End of component 19
 D=A
 @4019
 M=D
