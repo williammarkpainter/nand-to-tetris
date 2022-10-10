@@ -8,10 +8,10 @@ The code in HiKay.asm, prints HI KAY on the Hack Screen by writing to set memory
 
 HI KAY has 20 sections to render the text, each section is written as a column section, with a start memory location and an end memory location. When filling out the column seciton, 32 memory locations are skipped as this is the width of the screen memory location and it takes you to the next line in the same column.
 
-The .asm file start by inputting 20 values into RAM 3000-3019, and 20 values into RAM 4000-4019. These are the start and end memory locations for each character character section.
+The .asm file starts by inputting 20 values into RAM 3000-3019, and 20 values into RAM 4000-4019. These are the start and end memory locations for each character section.
 
-The code then set -1 as the intial write option in RAM Address 2, then takes the values form 30XX and 40XX into RAM[0] and RAM[1], then writes -1 to these memory locations, skipping 32 memory location each write.
+The code then sets the intial write option in RAM Address 2 to -1, then takes the values form 30XX and 40XX into RAM[0] and RAM[1], writting -1 to these memory locations, skipping 32 memory location each write. This is repeated for each character section.
 
 Once complete, there is a delay loop, then the write value in in RAM[2] is flipped to 0, and the process starts again to clear the screen.
 
-This is repeated in an infinate loop.
+This is repeated in an infinate loop to show flashing text on the screen.
