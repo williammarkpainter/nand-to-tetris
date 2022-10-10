@@ -4,7 +4,7 @@ The file can be loaded on the Hack Platform (using the CPU Emulator), to the fal
 
 Software can be downloaded from https://www.nand2tetris.org/software
 
-The code in HiKay.asm, print the HI KAY on the Hack Screen by writing to set memory locations. The value of -1 is written to RAM to display 16 pixel wide back line, and the value of 0 is written to clear any pixels.
+The code in HiKay.asm, prints HI KAY on the Hack Screen by writing to set memory locations. The value of -1 is written to RAM to display 16 pixel wide back line, and the value of 0 is written to clear any pixels.
 
 HI KAY has 20 sections to render the text, each section is written as a column section, with a start memory location and an end memory location. When filling out the column seciton, 32 memory locations are skipped as this is the width of the screen memory location and it takes you to the next line in the same column.
 
