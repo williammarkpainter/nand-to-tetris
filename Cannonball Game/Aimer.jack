@@ -1,0 +1,187 @@
+/**
+    Aimer class for cannon ball firing game, this is the line that sits above the
+    cannon ball. Provides information back for game play and firing through
+    the getXMove and getYMove functions
+    author: williammarkpainter@gmail.com
+    date: 12-sep-2022
+*/
+
+class Aimer{
+    field int baseX;
+    field int baseY;
+    field int startX;
+    field int startY;
+    field int powerLevel;
+
+    constructor Aimer new(){
+        let baseX = 255; 
+        let baseY = 214; // 230 - 16 (height of the ball)
+        let startX = 225; //baseX - 30
+        let startY = 214; // baseY as starts level
+
+        do Screen.setColor(true);
+        do Screen.drawLine(baseX,baseY,startX,startY); 
+
+        return this;
+
+    }
+
+    /** Dispose of the ball */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void moveAimer(){
+
+        // there is a loop of 120
+        var int loopCounter;
+        var int pauseLoopCounter;
+        var int pauseLoopCounter2;
+        var boolean running, spacePressed;
+        var char key;
+        var int previousX, previousY;
+
+        // power monitor vars
+        var int powerDirection;
+
+        let loopCounter = 0;
+        let key = 10;
+        let running = true;
+
+        while(running){
+
+            // save current X and Y for deleting current line
+            let previousX = startX;
+            let previousY = startY;
+
+            let spacePressed = false;
+
+            // progress base on position
+            if(loopCounter < 60 ){
+                let startX = startX + 1;
+                if(loopCounter < 30){
+                    let startY = startY - 1;
+                }
+                if(loopCounter > 29){
+                    let startY = startY + 1;
+                }
+            }
+
+            if(loopCounter > 59 ){
+                let startX = startX - 1;
+                if(loopCounter < 90){
+                    let startY = startY - 1;
+                }
+                if(loopCounter > 89){
+                    let startY = startY + 1;
+                }
+            }
+
+            // check if quit has been pressed
+            if(Keyboard.keyPressed() = 81){
+                return;
+            }
+
+
+            // redraw lines
+            do Screen.setColor(false);
+            do Screen.drawLine(baseX,baseY,previousX,previousY); 
+            do Screen.setColor(true);
+            do Screen.drawLine(baseX,baseY,startX,startY); 
+
+            // stop running when spacebar pressed
+            while(Keyboard.keyPressed() = 32){
+
+                if(~spacePressed){              // first time space pressed
+                    // clear last score area... not the best implimentation 
+                    do Screen.setColor(false);
+                    do Screen.drawRectangle(332, 190, 492, 220);
+                    // setup power monitor
+                    do drawPowerMonitor();
+                    let powerLevel = 0;
+                    let spacePressed = true;
+
+                    // ste fire message... not the best implimentation 
+                    do Output.moveCursor(22,1);
+                    do Output.printString("Release spacebar to fire cannon ball!               ");
+                }             
+                
+
+                if(powerLevel < 1){
+                    let powerDirection = 1;
+                }
+                if(powerLevel > 50){
+                    let powerDirection = -1;
+                }
+
+                if(powerDirection > 0){
+                    do drawPowerLine(true, powerLevel);
+                }
+
+                if(powerDirection < 0){
+                    do drawPowerLine(false, powerLevel);
+                }
+
+                let powerLevel = powerLevel + powerDirection;
+                do Sys.wait(12);
+
+                let running = false; 
+            }
+
+            // add in a pause loop
+            do Sys.wait(50);
+
+
+            // increase loopcounter
+            let loopCounter = loopCounter + 1;
+
+            if(loopCounter > 119){
+                let loopCounter = 0;
+            }
+
+            
+
+        }
+
+        return;
+
+    }
+
+    method void drawPowerMonitor(){
+        do Screen.setColor(true);
+        do Screen.drawLine(468, 168, 492,168);
+        do Screen.drawLine(492, 168, 492,222);
+        do Screen.drawLine(492, 222, 468,222);
+        do Screen.drawLine(468, 222, 468,168);
+
+        return;
+    }
+
+    method void drawPowerLine(boolean increase, int powerLevel){
+
+        do Screen.setColor(increase);
+        do Screen.drawLine(470, 220 - powerLevel, 490,220 - powerLevel);
+
+        return;
+    }
+
+    /** Return the amount of X that needs moving in a 10 pixel move*/
+    method int getXMove(){
+        var int XValue;
+        let XValue = startX - baseX;
+        let XValue = Math.divide(XValue, 3);
+        return XValue;
+    }
+    method int getYMove(){
+        var int YValue;
+        let YValue = startY - baseY;
+        let YValue = Math.divide(YValue, 3);
+        return YValue;
+    }
+    method int getPowerLevel(){
+        return powerLevel;
+    }
+
+
+}

@@ -1,0 +1,34 @@
+// Introduction Jack Programme to fire a ball into a screen
+
+class Main{
+    function void main(){
+
+        var char keyInput;
+        var Game gameController;
+        var Menu gameMenuController;
+
+        let keyInput = 0;
+
+        // write the inital welcome screen 
+        let gameMenuController = Menu.new();
+        do gameMenuController.welcomeScreen(true);
+
+        // loop till Q is inputed by user
+        while(~(keyInput=81)){
+            let keyInput = Keyboard.keyPressed();
+            if(keyInput=78){
+                
+                // Get new Game Controller for this round and run the game
+                let gameController = Game.new();
+                do gameController.runGame();
+                do gameController.dispose();
+                
+                // Game finished, back to the main menu
+                do gameMenuController.welcomeScreen(false);
+            }
+        }
+
+        return;
+
+    }
+}

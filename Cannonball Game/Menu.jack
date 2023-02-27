@@ -1,0 +1,82 @@
+/**
+    Navigation Menu class for cannon ball firing game, deals with simple
+    menu and user messaging then running between start, game, and restart
+    author: williammarkpainter@gmail.com
+    date: 12-sep-2022
+*/
+
+class Menu{
+
+    field int testInt;
+    
+    constructor Menu new(){
+        let testInt = 10;
+        return this;
+    }
+
+    /** Dispose of the Menu */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Clear and print the welcome screen depending on new game or returning game*/
+    method void welcomeScreen(boolean newScreen){
+        
+        if(newScreen){
+            do Screen.clearScreen();
+            do welcomeMessage();
+        }
+
+        if(~newScreen){
+            do clearTopSection();
+            do returnMessage();
+        }
+
+        do welcomeScreenOptions();
+
+        return;
+    }
+
+    /** Print the intitial welcome screen message if new to the game*/
+    method void welcomeMessage(){
+        // print welcome message
+        do Output.moveCursor(2,3);
+        do Output.printString("Welcome to the Cannon Ball game!");
+        do Output.moveCursor(4,3);
+        do Output.printString("Be ready to fire yourself to victory.");
+
+        return;
+    }
+
+    /** Print the intitial welcome screen message if returning from playing a previosu game */
+    method void returnMessage(){
+        // print retunr message
+        do Output.moveCursor(2,3);
+        do Output.printString("Well done on playing Cannon Ball!");
+        do Output.moveCursor(4,3);
+        do Output.printString("We hope you look forward to playing another game.");
+
+        return;
+    }
+
+    /** Print the welcome screen options (called for both new and returning players)*/
+    method void welcomeScreenOptions(){
+         // print options 
+        do Output.moveCursor(12,5);
+        do Output.printString("Please press N to start New game");
+        do Output.moveCursor(14,5);
+        do Output.printString("Please press Q to Quit the programme");
+
+        return;
+
+    }
+
+    /** If returning from a previous game, need to clear only the top section of the screen to retain the score */
+    method void clearTopSection(){
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0,0,511,200);
+        return;
+    }
+    
+}

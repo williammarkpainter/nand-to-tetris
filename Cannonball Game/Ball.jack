@@ -1,0 +1,565 @@
+/**
+    Ball class for cannon ball firing game, this handels the rendering and
+    movement of the cannon ball. This uses a the ball is 16 pixel by 16
+    author: williammarkpainter@gmail.com
+    date: 12-sep-2022
+*/
+
+class Ball{
+
+    field int topLeftRow, topLeftColumn;
+    field bool ballMoving;
+
+    static Array leftBitmaps;
+    static Array rightBitmaps;
+
+    constructor Ball new(int startTopLeftRow, int startTopLeftColumn){
+        // set starting position of new ball
+        let topLeftRow = startTopLeftRow;
+        let topLeftColumn = startTopLeftColumn;
+        let ballMoving = false;
+
+        // define ball bitmap array
+        let leftBitmaps = Array.new(136);       // store the first 8 rows of each bitmap (17 bitmaps in total)
+        let rightBitmaps = Array.new(136);       // store the first 8 rows of each bitmap (17 bitmaps in total)
+        do populateBitmaps();
+
+        // draw ball in starting position
+        do drawBallPosition(startTopLeftRow,startTopLeftColumn, false);   
+
+        return this;
+    }
+
+    /** Dispose of the ball */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+    
+
+    /** Move ball by set amount */
+    method void moveBall(int xShift, int yShift){
+    
+        var int screenColumnLeft, screenColumnRight, columnOffset;
+        var int startingTopRow;
+        var int memAddress;
+
+        let startingTopRow = topLeftRow;
+
+        // if top left row + yShift > 0, then do nothing
+        if((topLeftRow + yShift)<20){
+            return;
+        }
+
+        // if left column < 0 or > 511 - 16 the return
+        if((topLeftColumn+xShift)<0){
+            return;
+        }
+        if((topLeftColumn+xShift)>495){
+            return;
+        }
+
+        // draw new ball
+        do drawBallPosition(topLeftRow + yShift, topLeftColumn + xShift, false); 
+
+        
+        
+        // if y shift, then can clean the rows after the 
+        let screenColumnLeft = Math.divide(topLeftColumn,16);
+        let screenColumnRight = screenColumnLeft + 1;
+        let columnOffset = topLeftColumn - (screenColumnLeft * 16);
+        let memAddress = 16384 + (startingTopRow * 32) + (screenColumnLeft);
+
+        if (memAddress > 16384){
+            if (memAddress < 24575){
+                if(yShift > 0){     // moving downwards on screen, need to clear the old top row
+                    do Memory.poke(memAddress, 0);
+                    do Memory.poke(memAddress+1, 0);
+                }
+                if(yShift < 0){     // moving upwards on screen, need to clear the old bottom row
+                    do Memory.poke(memAddress+480, 0);
+                    do Memory.poke(memAddress+481, 0);
+                }
+            }
+        }
+        
+        return;
+    }
+
+    /** erase current ball */
+    method void eraseBall(){
+        // clear current ball 
+        do drawBallPosition(topLeftRow, topLeftColumn, true);
+
+        return;
+    }
+
+
+    /** Draw pixel perfect ball depending on screen location */
+    method void drawBallPosition(int rowBallTopLeft,  int columnBallTopLeft, boolean clear){
+
+        var int rowRefStart, rowRefEnd;
+        var int screenColumnLeft, screenColumnRight, columnOffset;
+        var int memAddress;
+
+        let topLeftRow = rowBallTopLeft;
+        let topLeftColumn = columnBallTopLeft;
+
+        // calculate left 'column/word'
+        let screenColumnLeft = Math.divide(columnBallTopLeft,16);
+        let screenColumnRight = screenColumnLeft + 1;
+        let columnOffset = columnBallTopLeft - (screenColumnLeft * 16);
+
+        // adjust for columns and rows offscreen
+
+        if(clear){
+
+            // clear left box
+
+            let memAddress = 16384 + (rowBallTopLeft * 32) + (screenColumnLeft);
+            do Memory.poke(memAddress+0, 0);
+            do Memory.poke(memAddress+32, 0);
+            do Memory.poke(memAddress+64, 0);
+            do Memory.poke(memAddress+96, 0);
+            do Memory.poke(memAddress+128, 0);
+            do Memory.poke(memAddress+160, 0);
+            do Memory.poke(memAddress+192, 0);
+            do Memory.poke(memAddress+224, 0);
+            do Memory.poke(memAddress+256, 0);
+            do Memory.poke(memAddress+288, 0);
+            do Memory.poke(memAddress+320, 0);
+            do Memory.poke(memAddress+352, 0);
+            do Memory.poke(memAddress+384, 0);
+            do Memory.poke(memAddress+416, 0);
+            do Memory.poke(memAddress+448, 0);
+            do Memory.poke(memAddress+480, 0);
+
+            // clear right box
+
+            let memAddress = 16384 + (rowBallTopLeft * 32) + (screenColumnLeft);
+            do Memory.poke(memAddress+1, 0);
+            do Memory.poke(memAddress+33, 0);
+            do Memory.poke(memAddress+65, 0);
+            do Memory.poke(memAddress+97, 0);
+            do Memory.poke(memAddress+129, 0);
+            do Memory.poke(memAddress+161, 0);
+            do Memory.poke(memAddress+193, 0);
+            do Memory.poke(memAddress+225, 0);
+            do Memory.poke(memAddress+257, 0);
+            do Memory.poke(memAddress+289, 0);
+            do Memory.poke(memAddress+321, 0);
+            do Memory.poke(memAddress+353, 0);
+            do Memory.poke(memAddress+385, 0);
+            do Memory.poke(memAddress+417, 0);
+            do Memory.poke(memAddress+449, 0);
+            do Memory.poke(memAddress+481, 0);
+        }
+
+        if(~clear){
+
+            // clear left box
+
+            let memAddress = 16384 + (rowBallTopLeft * 32) + (screenColumnLeft);
+            do Memory.poke(memAddress+0, leftBitmaps[(columnOffset*8)]);
+            do Memory.poke(memAddress+32, leftBitmaps[(columnOffset*8)+1]);
+            do Memory.poke(memAddress+64, leftBitmaps[(columnOffset*8)+2]);
+            do Memory.poke(memAddress+96, leftBitmaps[(columnOffset*8)+3]);
+            do Memory.poke(memAddress+128, leftBitmaps[(columnOffset*8)+4]);
+            do Memory.poke(memAddress+160, leftBitmaps[(columnOffset*8)+5]);
+            do Memory.poke(memAddress+192, leftBitmaps[(columnOffset*8)+6]);
+            do Memory.poke(memAddress+224, leftBitmaps[(columnOffset*8)+7]);
+            do Memory.poke(memAddress+256, leftBitmaps[(columnOffset*8)+7]);
+            do Memory.poke(memAddress+288, leftBitmaps[(columnOffset*8)+6]);
+            do Memory.poke(memAddress+320, leftBitmaps[(columnOffset*8)+5]);
+            do Memory.poke(memAddress+352, leftBitmaps[(columnOffset*8)+4]);
+            do Memory.poke(memAddress+384, leftBitmaps[(columnOffset*8)+3]);
+            do Memory.poke(memAddress+416, leftBitmaps[(columnOffset*8)+2]);
+            do Memory.poke(memAddress+448, leftBitmaps[(columnOffset*8)+1]);
+            do Memory.poke(memAddress+480, leftBitmaps[(columnOffset*8)]);
+
+            // clear right box
+
+            let memAddress = 16384 + (rowBallTopLeft * 32) + (screenColumnLeft);
+            do Memory.poke(memAddress+1, rightBitmaps[(columnOffset*8)]);
+            do Memory.poke(memAddress+33, rightBitmaps[(columnOffset*8)+1]);
+            do Memory.poke(memAddress+65, rightBitmaps[(columnOffset*8)+2]);
+            do Memory.poke(memAddress+97, rightBitmaps[(columnOffset*8)+3]);
+            do Memory.poke(memAddress+129, rightBitmaps[(columnOffset*8)+4]);
+            do Memory.poke(memAddress+161, rightBitmaps[(columnOffset*8)+5]);
+            do Memory.poke(memAddress+193, rightBitmaps[(columnOffset*8)+6]);
+            do Memory.poke(memAddress+225, rightBitmaps[(columnOffset*8)+7]);
+            do Memory.poke(memAddress+257, rightBitmaps[(columnOffset*8)+7]);
+            do Memory.poke(memAddress+289, rightBitmaps[(columnOffset*8)+6]);
+            do Memory.poke(memAddress+321, rightBitmaps[(columnOffset*8)+5]);
+            do Memory.poke(memAddress+353, rightBitmaps[(columnOffset*8)+4]);
+            do Memory.poke(memAddress+385, rightBitmaps[(columnOffset*8)+3]);
+            do Memory.poke(memAddress+417, rightBitmaps[(columnOffset*8)+2]);
+            do Memory.poke(memAddress+449, rightBitmaps[(columnOffset*8)+1]);
+            do Memory.poke(memAddress+481, rightBitmaps[(columnOffset*8)]);
+        }
+
+        return;
+
+    }
+
+    /** Populate left and right bitmaps with data */
+    method void populateBitmaps(){
+        let leftBitmaps[0] = 960 ;
+        let leftBitmaps[1] = 2016 ;
+        let leftBitmaps[2] = 4080 ;
+        let leftBitmaps[3] = 8184 ;
+        let leftBitmaps[4] = 16380 ;
+        let leftBitmaps[5] = 32766 ;
+        let leftBitmaps[6] = -1 ;
+        let leftBitmaps[7] = -1 ;
+        let leftBitmaps[8] = 1920 ;
+        let leftBitmaps[9] = 4032 ;
+        let leftBitmaps[10] = 8160 ;
+        let leftBitmaps[11] = 16368 ;
+        let leftBitmaps[12] = 32760 ;
+        let leftBitmaps[13] = -4 ;
+        let leftBitmaps[14] = -2 ;
+        let leftBitmaps[15] = -2 ;
+        let leftBitmaps[16] = 3840 ;
+        let leftBitmaps[17] = 8064 ;
+        let leftBitmaps[18] = 16320 ;
+        let leftBitmaps[19] = 32736 ;
+        let leftBitmaps[20] = -16 ;
+        let leftBitmaps[21] = -8 ;
+        let leftBitmaps[22] = -4 ;
+        let leftBitmaps[23] = -4 ;
+        let leftBitmaps[24] = 7680 ;
+        let leftBitmaps[25] = 16128 ;
+        let leftBitmaps[26] = 32640 ;
+        let leftBitmaps[27] = -64 ;
+        let leftBitmaps[28] = -32 ;
+        let leftBitmaps[29] = -16 ;
+        let leftBitmaps[30] = -8 ;
+        let leftBitmaps[31] = -8 ;
+        let leftBitmaps[32] = 15360 ;
+        let leftBitmaps[33] = 32256 ;
+        let leftBitmaps[34] = -256 ;
+        let leftBitmaps[35] = -128 ;
+        let leftBitmaps[36] = -64 ;
+        let leftBitmaps[37] = -32 ;
+        let leftBitmaps[38] = -16 ;
+        let leftBitmaps[39] = -16 ;
+        let leftBitmaps[40] = 30720 ;
+        let leftBitmaps[41] = -1024 ;
+        let leftBitmaps[42] = -512 ;
+        let leftBitmaps[43] = -256 ;
+        let leftBitmaps[44] = -128 ;
+        let leftBitmaps[45] = -64 ;
+        let leftBitmaps[46] = -32 ;
+        let leftBitmaps[47] = -32 ;
+        let leftBitmaps[48] = -4096 ;
+        let leftBitmaps[49] = -2048 ;
+        let leftBitmaps[50] = -1024 ;
+        let leftBitmaps[51] = -512 ;
+        let leftBitmaps[52] = -256 ;
+        let leftBitmaps[53] = -128 ;
+        let leftBitmaps[54] = -64 ;
+        let leftBitmaps[55] = -64 ;
+        let leftBitmaps[56] = -8192 ;
+        let leftBitmaps[57] = -4096 ;
+        let leftBitmaps[58] = -2048 ;
+        let leftBitmaps[59] = -1024 ;
+        let leftBitmaps[60] = -512 ;
+        let leftBitmaps[61] = -256 ;
+        let leftBitmaps[62] = -128 ;
+        let leftBitmaps[63] = -128 ;
+        let leftBitmaps[64] = -16384 ;
+        let leftBitmaps[65] = -8192 ;
+        let leftBitmaps[66] = -4096 ;
+        let leftBitmaps[67] = -2048 ;
+        let leftBitmaps[68] = -1024 ;
+        let leftBitmaps[69] = -512 ;
+        let leftBitmaps[70] = -256 ;
+        let leftBitmaps[71] = -256 ;
+        let leftBitmaps[72] = ~32767 ;
+        let leftBitmaps[73] = -16384 ;
+        let leftBitmaps[74] = -8192 ;
+        let leftBitmaps[75] = -4096 ;
+        let leftBitmaps[76] = -2048 ;
+        let leftBitmaps[77] = -1024 ;
+        let leftBitmaps[78] = -512 ;
+        let leftBitmaps[79] = -512 ;
+        let leftBitmaps[80] = 0 ;
+        let leftBitmaps[81] = ~32767;
+        let leftBitmaps[82] = -16384 ;
+        let leftBitmaps[83] = -8192 ;
+        let leftBitmaps[84] = -4096 ;
+        let leftBitmaps[85] = -2048 ;
+        let leftBitmaps[86] = -1024 ;
+        let leftBitmaps[87] = -1024 ;
+        let leftBitmaps[88] = 0 ;
+        let leftBitmaps[89] = 0 ;
+        let leftBitmaps[90] = ~32767;
+        let leftBitmaps[91] = -16384 ;
+        let leftBitmaps[92] = -8192 ;
+        let leftBitmaps[93] = -4096 ;
+        let leftBitmaps[94] = -2048 ;
+        let leftBitmaps[95] = -2048 ;
+        let leftBitmaps[96] = 0 ;
+        let leftBitmaps[97] = 0 ;
+        let leftBitmaps[98] = 0 ;
+        let leftBitmaps[99] = ~32767;
+        let leftBitmaps[100] = -16384 ;
+        let leftBitmaps[101] = -8192 ;
+        let leftBitmaps[102] = -4096 ;
+        let leftBitmaps[103] = -4096 ;
+        let leftBitmaps[104] = 0 ;
+        let leftBitmaps[105] = 0 ;
+        let leftBitmaps[106] = 0 ;
+        let leftBitmaps[107] = 0 ;
+        let leftBitmaps[108] = ~32767;
+        let leftBitmaps[109] = -16384 ;
+        let leftBitmaps[110] = -8192 ;
+        let leftBitmaps[111] = -8192 ;
+        let leftBitmaps[112] = 0 ;
+        let leftBitmaps[113] = 0 ;
+        let leftBitmaps[114] = 0 ;
+        let leftBitmaps[115] = 0 ;
+        let leftBitmaps[116] = 0 ;
+        let leftBitmaps[117] = ~32767;
+        let leftBitmaps[118] = -16384 ;
+        let leftBitmaps[119] = -16384 ;
+        let leftBitmaps[120] = 0 ;
+        let leftBitmaps[121] = 0 ;
+        let leftBitmaps[122] = 0 ;
+        let leftBitmaps[123] = 0 ;
+        let leftBitmaps[124] = 0 ;
+        let leftBitmaps[125] = 0 ;
+        let leftBitmaps[126] = ~32767;
+        let leftBitmaps[127] = ~32767;
+        let leftBitmaps[128] = 0 ;
+        let leftBitmaps[129] = 0 ;
+        let leftBitmaps[130] = 0 ;
+        let leftBitmaps[131] = 0 ;
+        let leftBitmaps[132] = 0 ;
+        let leftBitmaps[133] = 0 ;
+        let leftBitmaps[134] = 0 ;
+        let leftBitmaps[135] = 0 ;
+        
+        let rightBitmaps[0] = 0 ;
+        let rightBitmaps[1] = 0 ;
+        let rightBitmaps[2] = 0 ;
+        let rightBitmaps[3] = 0 ;
+        let rightBitmaps[4] = 0 ;
+        let rightBitmaps[5] = 0 ;
+        let rightBitmaps[6] = 0 ;
+        let rightBitmaps[7] = 0 ;
+        let rightBitmaps[8] = 0 ;
+        let rightBitmaps[9] = 0 ;
+        let rightBitmaps[10] = 0 ;
+        let rightBitmaps[11] = 0 ;
+        let rightBitmaps[12] = 0 ;
+        let rightBitmaps[13] = 0 ;
+        let rightBitmaps[14] = 1 ;
+        let rightBitmaps[15] = 1 ;
+        let rightBitmaps[16] = 0 ;
+        let rightBitmaps[17] = 0 ;
+        let rightBitmaps[18] = 0 ;
+        let rightBitmaps[19] = 0 ;
+        let rightBitmaps[20] = 0 ;
+        let rightBitmaps[21] = 1 ;
+        let rightBitmaps[22] = 3 ;
+        let rightBitmaps[23] = 3 ;
+        let rightBitmaps[24] = 0 ;
+        let rightBitmaps[25] = 0 ;
+        let rightBitmaps[26] = 0 ;
+        let rightBitmaps[27] = 0 ;
+        let rightBitmaps[28] = 1 ;
+        let rightBitmaps[29] = 3 ;
+        let rightBitmaps[30] = 7 ;
+        let rightBitmaps[31] = 7 ;
+        let rightBitmaps[32] = 0 ;
+        let rightBitmaps[33] = 0 ;
+        let rightBitmaps[34] = 0 ;
+        let rightBitmaps[35] = 1 ;
+        let rightBitmaps[36] = 3 ;
+        let rightBitmaps[37] = 7 ;
+        let rightBitmaps[38] = 15 ;
+        let rightBitmaps[39] = 15 ;
+        let rightBitmaps[40] = 0 ;
+        let rightBitmaps[41] = 0 ;
+        let rightBitmaps[42] = 1 ;
+        let rightBitmaps[43] = 3 ;
+        let rightBitmaps[44] = 7 ;
+        let rightBitmaps[45] = 15 ;
+        let rightBitmaps[46] = 31 ;
+        let rightBitmaps[47] = 31 ;
+        let rightBitmaps[48] = 0 ;
+        let rightBitmaps[49] = 1 ;
+        let rightBitmaps[50] = 3 ;
+        let rightBitmaps[51] = 7 ;
+        let rightBitmaps[52] = 15 ;
+        let rightBitmaps[53] = 31 ;
+        let rightBitmaps[54] = 63 ;
+        let rightBitmaps[55] = 63 ;
+        let rightBitmaps[56] = 1 ;
+        let rightBitmaps[57] = 3 ;
+        let rightBitmaps[58] = 7 ;
+        let rightBitmaps[59] = 15 ;
+        let rightBitmaps[60] = 31 ;
+        let rightBitmaps[61] = 63 ;
+        let rightBitmaps[62] = 127 ;
+        let rightBitmaps[63] = 127 ;
+        let rightBitmaps[64] = 3 ;
+        let rightBitmaps[65] = 7 ;
+        let rightBitmaps[66] = 15 ;
+        let rightBitmaps[67] = 31 ;
+        let rightBitmaps[68] = 63 ;
+        let rightBitmaps[69] = 127 ;
+        let rightBitmaps[70] = 255 ;
+        let rightBitmaps[71] = 255 ;
+        let rightBitmaps[72] = 7 ;
+        let rightBitmaps[73] = 15 ;
+        let rightBitmaps[74] = 31 ;
+        let rightBitmaps[75] = 63 ;
+        let rightBitmaps[76] = 127 ;
+        let rightBitmaps[77] = 255 ;
+        let rightBitmaps[78] = 511 ;
+        let rightBitmaps[79] = 511 ;
+        let rightBitmaps[80] = 15 ;
+        let rightBitmaps[81] = 31 ;
+        let rightBitmaps[82] = 63 ;
+        let rightBitmaps[83] = 127 ;
+        let rightBitmaps[84] = 255 ;
+        let rightBitmaps[85] = 511 ;
+        let rightBitmaps[86] = 1023 ;
+        let rightBitmaps[87] = 1023 ;
+        let rightBitmaps[88] = 30 ;
+        let rightBitmaps[89] = 63 ;
+        let rightBitmaps[90] = 127 ;
+        let rightBitmaps[91] = 255 ;
+        let rightBitmaps[92] = 511 ;
+        let rightBitmaps[93] = 1023 ;
+        let rightBitmaps[94] = 2047 ;
+        let rightBitmaps[95] = 2047 ;
+        let rightBitmaps[96] = 60 ;
+        let rightBitmaps[97] = 126 ;
+        let rightBitmaps[98] = 255 ;
+        let rightBitmaps[99] = 511 ;
+        let rightBitmaps[100] = 1023 ;
+        let rightBitmaps[101] = 2047 ;
+        let rightBitmaps[102] = 4095 ;
+        let rightBitmaps[103] = 4095 ;
+        let rightBitmaps[104] = 120 ;
+        let rightBitmaps[105] = 252 ;
+        let rightBitmaps[106] = 510 ;
+        let rightBitmaps[107] = 1023 ;
+        let rightBitmaps[108] = 2047 ;
+        let rightBitmaps[109] = 4095 ;
+        let rightBitmaps[110] = 8191 ;
+        let rightBitmaps[111] = 8191 ;
+        let rightBitmaps[112] = 240 ;
+        let rightBitmaps[113] = 504 ;
+        let rightBitmaps[114] = 1020 ;
+        let rightBitmaps[115] = 2046 ;
+        let rightBitmaps[116] = 4095 ;
+        let rightBitmaps[117] = 8191 ;
+        let rightBitmaps[118] = 16383 ;
+        let rightBitmaps[119] = 16383 ;
+        let rightBitmaps[120] = 480 ;
+        let rightBitmaps[121] = 1008 ;
+        let rightBitmaps[122] = 2040 ;
+        let rightBitmaps[123] = 4092 ;
+        let rightBitmaps[124] = 8190 ;
+        let rightBitmaps[125] = 16383 ;
+        let rightBitmaps[126] = 32767 ;
+        let rightBitmaps[127] = 32767 ;
+        let rightBitmaps[128] = 960 ;
+        let rightBitmaps[129] = 2016 ;
+        let rightBitmaps[130] = 4080 ;
+        let rightBitmaps[131] = 8184 ;
+        let rightBitmaps[132] = 16380 ;
+        let rightBitmaps[133] = 32766 ;
+        let rightBitmaps[134] = -1 ;
+        let rightBitmaps[135] = -1 ;
+        
+        return;
+    }
+
+    /** Method to return the current points value of the ball in that position*/
+    method int ballPoints(){
+
+        // break each target into 3 rectangles
+
+        // top left and right circle y=80 radius of 36
+        if(topLeftRow > 36){   // 80 - 36 -8 
+            // top row of section
+            if(topLeftRow < 60){ // 80 - 12 - 8
+                if(topLeftColumn>32){  // 60 - 20 -8           // left circle x centre is 60, radius 36
+                    if(topLeftColumn<72){ // 60 + 20 - 8 
+                        return 50;
+                    }
+                }
+                if(topLeftColumn>424){  // 452 - 20 -8           // left circle x centre is 452, radius 36
+                    if(topLeftColumn<464){ // 452 + 20 - 8 
+                        return 50;
+                    }
+                }
+            }
+            // middle row of section
+            if(topLeftRow < 82){ // 80 + 12 - 8 
+                if(topLeftColumn>16){  // 60 - 36 -8           // left circle x centre is 60, radius 36
+                    if(topLeftColumn<88){ // 60 + 36 - 8 
+                        return 50;
+                    }
+                }
+                if(topLeftColumn>408){  // 452 - 36 -8           // left circle x centre is 452, radius 36
+                    if(topLeftColumn<482){ // 452 + 36 - 8 
+                        return 50;
+                    }
+                }
+            }
+            // bottom row of section
+            if(topLeftRow < 108){ // 80 + 36 - 8 
+                if(topLeftColumn>32){  // 60 - 20 -8           // left circle x centre is 60, radius 36
+                    if(topLeftColumn<72){ // 60 + 20 - 8 
+                        return 50;
+                    }
+                }
+                if(topLeftColumn>424){  // 452 - 20 -8           // left circle x centre is 452, radius 36
+                    if(topLeftColumn<464){ // 452 + 20 - 8 
+                        return 50;
+                    }
+                }
+            }   
+        }
+
+        // middle target  y=90 (x = 256) radius of 50 and 24 
+        if(topLeftRow > 32){    // 90 - 50 - 8 top of big target
+            if(topLeftRow < 132){    // 90 + 50 - 8 bottom of big target
+                if(topLeftRow > 58){    // 90 - 24 - 8 top of big target
+                    if(topLeftRow < 106){  // 90 + 24 -8 
+                        // model inner target as a simple square
+                        if(topLeftColumn > 224){ // 256 - 24 -8 
+                            if(topLeftColumn < 272) {   // 256 + 24 -8
+                                return 30;
+                            }
+                        }
+                        // outer circle band to the left and right of the inner target
+                        if(topLeftColumn > 198){ // 256 - 50 -8 
+                            if(topLeftColumn < 298) {   // 256 + 50 -8
+                                return 10;
+                            }
+                        }
+                    }
+                }
+                // if statements for x corrdinates of the top and bottom thirds of the larger target
+                if(topLeftColumn > 208){ // 256 - 40 -8 
+                    if(topLeftColumn < 288) {   // 256 + 40 -8
+                        return 10;
+                    }
+                }
+            }
+        }
+          
+
+
+        return 0;
+    }
+
+}

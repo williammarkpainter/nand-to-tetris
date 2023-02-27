@@ -1,0 +1,233 @@
+/** 
+    Main game logic for for the cannon ball firing programme
+    author: williammarkpainter@gmail.com
+    date: 12-sep-2022
+**/
+
+class Game{
+
+    // General Game Information
+    field int gameScore;
+    field Ball gameBall;
+    field int startBallPosnX, startBallPosnY;
+    field Aimer gameAimer;
+    field int ballsRemaining;
+    field int status; 
+    field boolean gameRunning;
+    field char keyGameInput;
+    field Background gameBackground; // need a background controller to draw basic background elements
+    // field Ball gameBall // need a single ball object
+
+    /** Game Class Constructor*/
+    constructor Game new(){
+
+        let keyGameInput = 0;
+        let gameScore = 0;
+        let ballsRemaining = 10;
+
+        let startBallPosnX = 214; //230 (bottom line) - 16
+        let startBallPosnY = 248; // 512 / 2 - 8
+
+        let gameBackground = Background.new();
+
+        do basicSreenSetup();
+
+        return this;
+
+    }
+
+    /** Game setup */
+    method void basicSreenSetup(){
+        // clear the screen
+        do Screen.clearScreen();
+        do Game.printTestMessage();
+        return;
+    }
+
+    /** Run the game */
+    method void runGame(){
+
+        var int xMove, yMove, xCounter, yCounter;
+        var int xDirection, yDirection;
+        var int lcounter;
+        var int powerLevel;
+        var int lastScore;
+
+        var boolean resetRun;
+        let resetRun = true;
+
+        let gameRunning = true;
+
+        // Draw basic background
+        do gameBackground.writeGameMessage("Running Game");
+        do gameBackground.drawBaseBackground();
+
+        // Draw initial ball
+        let gameBall = Ball.new(startBallPosnX,startBallPosnY);
+
+        // Run game until finish of 10 ball of Q is pressed
+
+        while(gameRunning){
+            let keyGameInput = Keyboard.keyPressed();
+
+            if(resetRun){
+                
+                let resetRun = false;
+            }
+
+            // draw aimer
+
+            let gameAimer = Aimer.new();
+
+            // check for exit conditions
+            if(keyGameInput=81){
+                let gameRunning = false;
+            }
+
+            // update game information 
+            do gameBackground.writeGameStats(ballsRemaining, gameScore);
+            do gameBackground.writeGameMessage("Press and hold spacebar to aim and select power! (Q to quit)");
+
+            // loop aimer 
+            do gameAimer.moveAimer();
+
+            // check if quit has been pressed
+            if(Keyboard.keyPressed() = 81){
+                let gameRunning = false;
+            } else {
+
+
+                // get aimer X and Y moves
+                let xMove = gameAimer.getXMove();
+                let yMove = gameAimer.getYMove();
+                let powerLevel = gameAimer.getPowerLevel();
+
+                do gameBackground.writeGameMessage("Fire!!! Goodluck!!!                      ");
+    
+
+                // MSetup move conditions
+                let lcounter = 0;
+                let xDirection = 1;
+                if(xMove < 0){
+                    let xDirection = -1;
+                }
+                let xMove = Math.abs(xMove);
+                let yDirection = 1;
+                if(yMove < 0){
+                    let yDirection = -1;
+                }
+                let yMove = Math.abs(yMove);
+
+                do gameAimer.dispose();
+
+                // Action X and Y ball move on screen
+
+                while(lcounter<powerLevel){
+                    // move in X direction first
+                    let xCounter = 0;
+                    
+                    while(xCounter < xMove){
+                        do gameBall.moveBall(xDirection,0);
+                        let xCounter = xCounter + 1;
+                        do Sys.wait(7);
+                    }
+
+                    // move in Y direction second (simplified approach, need refining)
+                    let yCounter = 0;
+    
+                    while(yCounter < yMove){
+                        do gameBall.moveBall(0,yDirection);
+                        let yCounter = yCounter + 1;
+                        do Sys.wait(7);
+                    }
+                    
+                    let lcounter = lcounter + 1;
+                }
+
+                // return score to user
+                let lastScore = gameBall.ballPoints();
+                let gameScore = gameScore + lastScore;
+                do gameBackground.drawBaseBackground();
+                do gameBackground.writeLastScore(lastScore);
+
+                if(lastScore>0){
+                    do gameBackground.writeGameMessage("Boom! It is a hit! Well Done!     ");
+                } else {
+                    do gameBackground.writeGameMessage("Ohhhhh unlucky, so close, keep trying    ");
+                }
+
+                do Sys.wait(200);
+                do gameBall.dispose();
+
+                // prep for next ball or exit game play 
+                let ballsRemaining = ballsRemaining -1;
+                if(ballsRemaining < 1){
+                    let gameRunning = false;
+                }
+                else{
+                    let gameBall = Ball.new(startBallPosnX,startBallPosnY);
+                }
+            
+            }
+        }
+
+
+        // Print the final score screen, and when any key is pressed exit
+        do Screen.clearScreen();
+        do printFinalScore(gameScore);
+
+        // Loop till the E key is pressed
+        let keyGameInput = 0;
+        while(~(keyGameInput = 69)){
+            let keyGameInput = Keyboard.keyPressed();
+        }
+
+        // print a game score to provide the next 'Main Menu' with a simple guide to the player on their previous rounds score
+        do Screen.clearScreen();
+        do Game.printReturnMessage(gameScore);
+        return;
+    }
+
+    /** Dispose of the Game */
+    method void dispose(){
+        do gameBackground.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+
+    /** Print test Message */
+    function void printTestMessage(){
+        // print welcome message
+        do Output.moveCursor(2,3);
+        do Output.printString("Welcome to the Cannon Ball game!");
+
+        do Output.moveCursor(6,3);
+        do Output.printString("Press Q at any time to quit!");
+
+        return;
+    }
+
+    /** Print Return the Message */
+    function void printReturnMessage(int score){
+        do Output.moveCursor(20,3);
+        do Output.printString("Well Done. Your previous score was: ");
+        do Output.moveCursor(20,40);
+        do Output.printInt(score);
+        return;
+    }
+
+    /** Print score Message */
+    method void printFinalScore(int score){
+        do Output.moveCursor(3,3);
+        do Output.printString("Well Done. Your previous score was: ");
+        do Output.moveCursor(3,40);
+        do Output.printInt(score);
+        do Output.moveCursor(6,3);
+        do Output.printString("Press E to Exit to main menu!");
+        return;
+    }
+
+
+
+}

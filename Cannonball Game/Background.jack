@@ -1,0 +1,131 @@
+/**
+    Background class for cannon ball firing game, deals with rendering 
+    of basic static background objects and messaging
+    author: williammarkpainter@gmail.com
+    date: 12-sep-2022
+*/
+class Background{
+
+    field int counter;
+
+    /** Constructor of this Background Object */
+    constructor Background new(){
+        let counter = 0;
+
+        return this;
+    }
+
+    /** Dispose of this Background Object */
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void drawBaseBackground(){
+        // clear screen
+
+        do Screen.clearScreen();
+        
+        // print point
+        do Output.moveCursor(0,0);
+        do Output.printString("    (50 pts)         (10 pts (30 pts) 10 pts)       (50 pts)");
+        
+        // write left cricle
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(60,80,36);
+        do Screen.setColor(false);
+        do Screen.drawCircle(60,80,33);
+
+        // Write Centre Circle
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(256,90,50);
+        do Screen.setColor(false);
+        do Screen.drawCircle(256,90,47);
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(256,90,24);
+        do Screen.setColor(false);
+        do Screen.drawCircle(256,90,21);
+
+        // draw right circle
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(452,80,36);
+        do Screen.setColor(false);
+        do Screen.drawCircle(452,80,33);
+
+        // draw baseline
+
+        do Screen.setColor(true);
+        do Screen.drawLine(0,230, 511,230);
+
+        return;
+    }
+
+    //** Method to draw line at the bottom of the playing screen above the game messaging*/
+    method void drawBaseLine(){
+        do Screen.setColor(true);
+        do Screen.drawLine(0,230,511,230);
+        do Screen.drawLine(255,0,255,255);
+        return;
+    }
+
+
+    //** Method to write game messages to bottom line of screen */
+    method void writeGameMessage(string message){
+        do Output.moveCursor(22,1);
+        do Output.printString(message);
+        return;
+    }
+
+    //** Method to write Running Score and Information*/
+    method void writeGameStats(int ballsRemaining, int score){
+        // clear current box
+        do Screen.setColor(false);
+        do Screen.drawRectangle(20, 180, 190, 220);
+        // draw lines for box
+        do Screen.setColor(true);
+        do Screen.drawLine(20,180,190,180);
+        do Screen.drawLine(190,180,190,220);
+        do Screen.drawLine(190,220,20,220);
+        do Screen.drawLine(20,220,20,180);
+        // write data
+        do Output.moveCursor(17,3);
+        do Output.printString("Balls Remaining: ");
+        do Output.moveCursor(17,20);
+        do Output.printInt(ballsRemaining);
+        do Output.moveCursor(18,3);
+        do Output.printString("Score: ");
+        do Output.moveCursor(18,20);
+        do Output.printInt(score);
+
+        return;
+    }
+
+    //** Method to write last ball score to screen */
+    method void writeLastScore(int score){
+        // draw lines for box
+        do Screen.setColor(true);
+        do Screen.drawLine(332,190,492,190);
+        do Screen.drawLine(492,190,492,220);
+        do Screen.drawLine(492,220,332,220);
+        do Screen.drawLine(332,220,332,190);
+        // write data
+        do Output.moveCursor(18,42);
+        do Output.printString("Last Ball Score: ");
+        do Output.moveCursor(18,59);
+        do Output.printInt(score);
+
+        return;
+    }
+    method void clearLastScore(){
+        // clear current box
+        do Screen.setColor(false);
+        do Screen.drawRectangle(332, 190, 492, 220);
+
+        return;
+    }
+
+}
